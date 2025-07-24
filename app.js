@@ -11,7 +11,7 @@ import timelineRouter from "./router/timeline.routes.js";
 import softwareApplicationRouter from "./router/softwareApplications.routes.js";
 import skillRouter from "./router/skills.routes.js";
 import projectRouter from "./router/project.routes.js";
-
+import job from "./utils/cron.js";
 const app = express();
 
 dotenv.config({ path: "./config/config.env" });
@@ -24,6 +24,11 @@ app.use(
   })
 );
 
+if(process.env.NODE_ENV === "production"){
+  job.start();
+}
+
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -32,6 +37,11 @@ app.use(
     tempFileDir: "/tmp/",
   })
 );
+
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ message: "Server is running" });
+});
+
 
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/user", userRouter);
